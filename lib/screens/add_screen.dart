@@ -13,6 +13,7 @@ class AddScreen extends StatelessWidget {
   final FocusNode _numBedFocusNode = FocusNode();
   final FocusNode _numKitFocusNode = FocusNode();
   final FocusNode _numBathFocusNode = FocusNode();
+  final FocusNode _starFocusNode = FocusNode();
   final FocusNode _priceFocusNode = FocusNode();
   final FocusNode _noteFocusNode = FocusNode();
   final FocusNode _nameReporterFocusNode = FocusNode();
@@ -23,11 +24,13 @@ class AddScreen extends StatelessWidget {
       onTap: () {
         _apartmentNameFocusNode.unfocus();
         _addressFocusNode.unfocus();
+        _cityFocusNode.unfocus();
         _furnitureFocusNode.unfocus();
         _typeFocusNode.unfocus();
         _numBedFocusNode.unfocus();
         _numKitFocusNode.unfocus();
         _numBathFocusNode.unfocus();
+        _starFocusNode.unfocus();
         _priceFocusNode.unfocus();
         _noteFocusNode.unfocus();
         _nameReporterFocusNode.unfocus();
@@ -51,6 +54,7 @@ class AddScreen extends StatelessWidget {
                 numBathFocusNode: _numBathFocusNode,
                 numKitFocusNode: _numKitFocusNode,
                 numBedFocusNode: _numBedFocusNode,
+                starFocusNode: _numBedFocusNode,
                 priceFocusNode: _priceFocusNode,
                 nameReporterFocusNode: _nameReporterFocusNode,
                 noteFocusNode: _noteFocusNode,

@@ -1,4 +1,4 @@
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/models/user.dart';
 import 'package:apartment_project/screens/edit_screen.dart';
 import 'package:apartment_project/shares/const.dart';
@@ -11,7 +11,7 @@ class ItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: ApartmentData.readApartments(),
+      stream: Databases.readData(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong');
@@ -22,17 +22,19 @@ class ItemList extends StatelessWidget {
             itemBuilder: (context, index) {
               var noteInfo = snapshot.data!.docs[index];
               String docID = snapshot.data!.docs[index].id;
-              String nameApm = noteInfo.get('nameApm');
-              String address = noteInfo.get('address');
-              String city = noteInfo.get('city');
-              String furniture = noteInfo.get('furniture');
-              String type = noteInfo.get('type');
-              int numBed = noteInfo.get('numBed');
-              int numKit = noteInfo.get('numKit');
-              int numBath = noteInfo.get('numBath');
-              int price = noteInfo.get('price');
-              String nameReporter = noteInfo.get('nameOwn');
-              String note = noteInfo.get('note');
+              String nameApm = noteInfo.get('Name Rental');
+              String address = noteInfo.get('Address');
+              String city = noteInfo.get('City');
+              String furniture = noteInfo.get('Furniture Property');
+              String type = noteInfo.get('Type Property');
+              int numBed = noteInfo.get('No Bed');
+              int numKit = noteInfo.get('No Kit');
+              int numBath = noteInfo.get('No Bath');
+              int price = noteInfo.get('Price');
+              String nameReporter = noteInfo.get('Name Reporter');
+              String note = noteInfo.get('Note');
+              double ratingStar = noteInfo.get('Rating Star');
+              String createdTime = noteInfo.get('createdTime');
 
               return Ink(
                 decoration: BoxDecoration(
@@ -48,7 +50,7 @@ class ItemList extends StatelessWidget {
                           DetailApartment(data: noteInfo))
                   ),
                   title: Text(
-                    "$nameApm posted by $nameReporter",
+                    "$nameApm  ($ratingStar) Star",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: styleHeading_2Text.copyWith(color: CustomColors.firebaseBlack.withOpacity(0.8)),
@@ -79,6 +81,7 @@ class ItemList extends StatelessWidget {
                             currentPrice: price,
                             currentNameReporter: nameReporter,
                             currentNote: note,
+                            currentStar: ratingStar,
                             documentId: docID,
                           ),
                         ),

@@ -1,9 +1,10 @@
 import 'dart:io';
-import 'package:apartment_project/models/address.dart';
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/local.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/models/local_api.dart';
 import 'package:apartment_project/shares/const.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:apartment_project/shares/custom_color.dart';
@@ -12,6 +13,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'custom_form_field.dart';
+
+DateTime now = DateTime.now();
+String formatDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
 
 class EditItemForm extends StatefulWidget {
   //define focus node
@@ -36,6 +40,7 @@ class EditItemForm extends StatefulWidget {
   final int currentPrice;
   final String currentNote;
   final String currentNameReporter;
+  final double currentRatingStar;
   final String documentId;
 
   const EditItemForm({
@@ -61,6 +66,7 @@ class EditItemForm extends StatefulWidget {
     required this.currentPrice,
     required this.currentNote,
     required this.currentNameReporter,
+    required this.currentRatingStar,
     required this.documentId,
   });
 
@@ -83,7 +89,6 @@ class _EditItemFormState extends State<EditItemForm> {
   ];
 
   int? _city;
-
   late TextEditingController _apartmentNameController;
   late TextEditingController _addressController;
   late TextEditingController _cityController;
@@ -95,6 +100,7 @@ class _EditItemFormState extends State<EditItemForm> {
   late TextEditingController _numKitController;
   late TextEditingController _numBathController ;
   late TextEditingController _priceController;
+  late double currentRating = widget.currentRatingStar;
 
   @override
   void initState() {
@@ -173,8 +179,6 @@ class _EditItemFormState extends State<EditItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formatDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
     return Form(
       key: _editItemFormKey,
       child: Column(
@@ -499,6 +503,29 @@ class _EditItemFormState extends State<EditItemForm> {
                   label: 'Note',
                   hint: 'Enter a note(optional)...',
                 ),
+                SizedBox(height: 18,),
+                Center(
+                  child: Column(
+                    children: [
+                      Text('Rating: $currentRating',
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                      ),
+                      RatingBar.builder(
+                          initialRating: currentRating,
+                          minRating: 1,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          updateOnDrag: true,
+                          onRatingUpdate: (rating) {
+                            setState(() {
+                              this.currentRating = rating;
+                            });
+                          })
+                    ],
+                  ),
+                ),
                 SizedBox(height: 8.0),
                 Container(
                   child: Row(
@@ -546,86 +573,7 @@ class _EditItemFormState extends State<EditItemForm> {
                 ),
               ),
               onPressed: () async {
-                showDialog(
-                    context: context,
-                    builder: (_context){
-                      return AlertDialog(
-                        title: Text("Confirm your information",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                        content: Text(
-                          'Name Reporter: ' + _nameReporterController.text + '\n\n' +
-                              'Rental name: ' + _apartmentNameController.text + '\n\n' +
-                              'Furniture: ' + _furnitureController.text + '\n\n' +
-                              'Address: ' + _addressController.text + '\n\n' +
-                              'city: ' + _cityController.text + '\n\n' +
-                              'Type: ' + _typeController.text + '\n\n' +
-                              'Number of Bedroom: ' + _numBedController.text + '\n\n' +
-                              'Number of Kitten: ' + _numKitController.text + '\n\n' +
-                              'Number of Bathroom: ' + _numBathController.text + '\n\n' +
-                              'Price: ' + _priceController.text + '\n\n' +
-                              'Note: ' + _noteController.text + '\n\n'
-                              'Time: ' + formatDate + '\n\n'
-                          ,
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                        ),
-                        actions: [
-                          TextButton(
-                              onPressed: () async {
-                                setState(() async {
-                                  widget.apartmentNameFocusNode.unfocus();
-                                  widget.noteFocusNode.unfocus();
-                                  if (_editItemFormKey.currentState!.validate()) {
-                                    setState(() {
-                                      ScaffoldMessenger.of(_context)
-                                          .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Create succesfully at $formatDate')));
-                                      Navigator.of(context).pop();
-                                      _isProcessing = true;
-                                    });
-                                    await ApartmentData.updateApartment(
-                                        docId: widget.documentId,
-                                        rentalName: _apartmentNameController.text,
-                                        address: _addressController.text,
-                                        city: _cityController.text,
-                                        furniture: _furnitureController.text,
-                                        type: _typeController.text,
-                                        numBath: int.parse(_numBathController.text),
-                                        numBed: int.parse(_numBedController.text),
-                                        numKit: int.parse(_numKitController.text),
-                                        price: int.parse(_priceController.text),
-                                        note: _noteController.text,
-                                        nameOwn: _nameReporterController.text,
-                                        updatedTime: formatDate
-                                    );
-                                    Navigator.of(context).pop();
-                                  }
-                                });
-                                ScaffoldMessenger.of(_context)
-                                    .showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            'Invalid enter fields. Please check the validator on the fields!!')));
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("Yes", style: dialogTextStyle,)),
-                          TextButton(
-                              onPressed: (){
-                                setState(() {
-                                  _isProcessing = false;
-                                  Navigator.of(context).pop();
-                                });
-                              },
-                              child: Text("No", style: dialogTextStyle,)),
-                        ],
-                        elevation: 24.0,
-                        backgroundColor: CustomColors.firebaseWhite,
-                      );
-                    });
-                widget.apartmentNameFocusNode.unfocus();
-                widget.noteFocusNode.unfocus();
-
+                showConfirmDialog();
               },
               child: Padding(
                 padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
@@ -645,4 +593,83 @@ class _EditItemFormState extends State<EditItemForm> {
       ),
     );
   }
+
+  showConfirmDialog() => showDialog(
+      context: context,
+      builder: (_context){
+        return AlertDialog(
+          title: Text("Confirm your information",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          content: Text(
+            'Name Reporter: ' + _nameReporterController.text + '\n\n' +
+                'Rental name: ' + _apartmentNameController.text + '\n\n' +
+                'Furniture: ' + _furnitureController.text + '\n\n' +
+                'Address: ' + _addressController.text + '\n\n' +
+                'city: ' + _cityController.text + '\n\n' +
+                'Type: ' + _typeController.text + '\n\n' +
+                'Number of Bedroom: ' + _numBedController.text + '\n\n' +
+                'Number of Kitten: ' + _numKitController.text + '\n\n' +
+                'Number of Bathroom: ' + _numBathController.text + '\n\n' +
+                'Price: ' + _priceController.text + '\n\n' +
+                'Note: ' + _noteController.text + '\n\n'
+                'Time: ' + formatDate + '\n\n'
+            ,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  setState(() async {
+                    widget.apartmentNameFocusNode.unfocus();
+                    widget.noteFocusNode.unfocus();
+                    if (_editItemFormKey.currentState!.validate()) {
+                      setState(() {
+                        ScaffoldMessenger.of(_context)
+                            .showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Create succesfully at $formatDate')));
+                        Navigator.of(context).pop();
+                        _isProcessing = true;
+                      });
+                      await Databases.updateData(
+                          docId: widget.documentId,
+                          rentalName: _apartmentNameController.text,
+                          address: _addressController.text,
+                          city: _cityController.text,
+                          furniture: _furnitureController.text,
+                          type: _typeController.text,
+                          numBath: int.parse(_numBathController.text),
+                          numBed: int.parse(_numBedController.text),
+                          numKit: int.parse(_numKitController.text),
+                          price: int.parse(_priceController.text),
+                          note: _noteController.text,
+                          nameOwn: _nameReporterController.text,
+                          star: currentRating,
+                          updatedTime: formatDate
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  });
+                  ScaffoldMessenger.of(_context)
+                      .showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Invalid enter fields. Please check the validator on the fields!!')));
+                  Navigator.of(context).pop();
+                },
+                child: Text("Yes", style: dialogTextStyle,)),
+            TextButton(
+                onPressed: (){
+                  setState(() {
+                    _isProcessing = false;
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Text("No", style: dialogTextStyle,)),
+          ],
+          elevation: 24.0,
+          backgroundColor: CustomColors.firebaseWhite,
+        );
+      });
 }

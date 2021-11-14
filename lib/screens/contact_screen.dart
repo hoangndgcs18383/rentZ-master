@@ -1,4 +1,4 @@
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/models/user.dart';
 import 'package:apartment_project/widgets/custom_detail_item_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

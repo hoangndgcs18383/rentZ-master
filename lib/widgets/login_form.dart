@@ -1,4 +1,4 @@
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/models/user.dart';
 import 'package:apartment_project/screens/home_page.dart';
 import 'package:apartment_project/shares/custom_color.dart';

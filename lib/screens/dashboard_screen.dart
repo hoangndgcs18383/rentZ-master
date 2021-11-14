@@ -6,12 +6,9 @@ import 'package:apartment_project/screens/search_screen.dart';
 import 'package:apartment_project/shares/custom_color.dart';
 import 'package:apartment_project/widgets/custom_appbar.dart';
 import 'package:apartment_project/widgets/custom_nav_bar_menu.dart';
-import 'package:apartment_project/widgets/item_list.dart';
-import 'package:apartment_project/widgets/search_bar/custom_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'about_screen.dart';
 import 'add_screen.dart';
-import 'contact_screen.dart';
 import 'list_screen.dart';
 import 'package:animations/animations.dart';
 
@@ -47,24 +44,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ...MenuItems.itemFirst.map((buildItem)).toList(),
               ...MenuItems.itemSecond.map((buildItem)).toList()
             ]
-          )
+          ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.of(context).push(
-      //       MaterialPageRoute(
-      //         builder: (context) => AddScreen(),
-      //       ),
-      //     );
-      //   },
-      //   backgroundColor: CustomColors.firebaseOrange,
-      //   child: const Icon(
-      //     Icons.add,
-      //     color: Colors.white,
-      //     size: 32,
-      //   ),
-      // ),
       body: PageTransitionSwitcher(
         duration: Duration(seconds: 1),
           transitionBuilder: (child, animation, secondaryAnimation) =>

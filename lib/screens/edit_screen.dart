@@ -1,4 +1,4 @@
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/shares/const.dart';
 import 'package:apartment_project/shares/custom_color.dart';
 import 'package:apartment_project/widgets/custom_appbar.dart';
@@ -16,6 +16,7 @@ class EditScreen extends StatefulWidget {
   final int currentPrice;
   final String currentNote;
   final String currentNameReporter;
+  final double currentStar;
   final String documentId;
 
   EditScreen({
@@ -30,6 +31,7 @@ class EditScreen extends StatefulWidget {
     required this.currentPrice,
     required this.currentNote,
     required this.currentNameReporter,
+    required this.currentStar,
     required this.documentId,
   });
 
@@ -49,6 +51,7 @@ class _EditScreenState extends State<EditScreen> {
   final FocusNode _priceFocusNode = FocusNode();
   final FocusNode _noteFocusNode = FocusNode();
   final FocusNode _nameReporterFocusNode = FocusNode();
+  final FocusNode _starFocusNode = FocusNode();
 
   bool _isDeleting = false;
 
@@ -116,7 +119,7 @@ class _EditScreenState extends State<EditScreen> {
                                     _isDeleting = true;
                                     Navigator.of(context).pop();
                                   });
-                                  await ApartmentData.deleteApartment(
+                                  await Databases.deleteData(
                                     docId: widget.documentId,
                                   );
                                   Navigator.of(context).pop();
@@ -173,6 +176,7 @@ class _EditScreenState extends State<EditScreen> {
                 currentPrice: widget.currentPrice,
                 currentNote: widget.currentNote,
                 currentNameReporter: widget.currentNameReporter,
+                currentRatingStar: widget.currentStar,
               ),
             ),
           ),

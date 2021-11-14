@@ -1,5 +1,6 @@
 import 'package:apartment_project/models/user.dart';
 import 'package:apartment_project/shares/custom_color.dart';
+import 'package:apartment_project/widgets/app_router.dart';
 import 'package:apartment_project/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _MyAppState extends State<MyApp> {
       initialData: null,
       catchError: (User, MyUser) => null,
       child: MaterialApp(
+        onGenerateRoute: AppRoute.onGererateRoute,
           debugShowCheckedModeBanner: false,
           title: 'Apartment Rent',
           theme: ThemeData(

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:apartment_project/models/address.dart';
-import 'package:apartment_project/models/apartments.dart';
+import 'package:apartment_project/models/local.dart';
+import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/models/local_api.dart';
 import 'package:apartment_project/shares/const.dart';
 import 'package:apartment_project/shares/custom_color.dart';
@@ -11,14 +11,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'custom_form_field.dart';
 
-final CollectionReference _mainCollection =
-FirebaseFirestore.instance.collection('data');
+// final CollectionReference _mainCollection = FirebaseFirestore.instance.collection('data');
 final FirebaseAuth _auth = FirebaseAuth.instance;
+DateTime now = DateTime.now();
+String formatDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
+
 
 class AddItemForm extends StatefulWidget {
   //define focus node
@@ -30,6 +33,7 @@ class AddItemForm extends StatefulWidget {
   final FocusNode numBedFocusNode;
   final FocusNode numKitFocusNode;
   final FocusNode numBathFocusNode;
+  final FocusNode starFocusNode;
   final FocusNode priceFocusNode;
   final FocusNode noteFocusNode;
   final FocusNode nameReporterFocusNode;
@@ -43,6 +47,7 @@ class AddItemForm extends StatefulWidget {
     required this.numBedFocusNode,
     required this.numKitFocusNode,
     required this.numBathFocusNode,
+    required this.starFocusNode,
     required this.priceFocusNode,
     required this.noteFocusNode,
     required this.nameReporterFocusNode,
@@ -56,6 +61,7 @@ class _AddItemFormState extends State<AddItemForm> {
   final _addItemFormKey = GlobalKey<FormState>();
   final _listFurniture = ['Furnished', 'Unfurnished', 'Part Furnished'];
   final _listType = ['Apartment', 'Penthouse', 'House', 'Villa'];
+  String docId = FirebaseFirestore.instance.collection('data').doc('rentalZ').collection(_auth.currentUser!.uid).id;
 
   bool _isProcessing = false;
   final TextEditingController _rentalNameController = TextEditingController();
@@ -63,6 +69,7 @@ class _AddItemFormState extends State<AddItemForm> {
   String? _furnitureController;
   String? _typeController;
   String? _cityController;
+  double rating = 0;
 
   // TextEditingController _typeController = TextEditingController();
   final TextEditingController _numBedController = TextEditingController();
@@ -81,7 +88,7 @@ class _AddItemFormState extends State<AddItemForm> {
   Future<void> _upload(ImageSource inputSource) async {
     try {
       final pickedImage =
-      await ImagePicker().pickImage(source: inputSource, maxWidth: 1920);
+          await ImagePicker().pickImage(source: inputSource, maxWidth: 1920);
 
       final String fileName = path.basename(pickedImage!.path);
       File imageFile = File(pickedImage.path);
@@ -115,8 +122,6 @@ class _AddItemFormState extends State<AddItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formatDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
     return Form(
         key: _addItemFormKey,
         child: Column(
@@ -231,15 +236,15 @@ class _AddItemFormState extends State<AddItemForm> {
                             focusNode: widget.cityFocusNode,
                             dropdownColor: Colors.blueAccent,
                             onChanged: (String? val) => setState(() {
-                              _cityController = val;
-                              print(_cityController);
-                            }),
+                                  _cityController = val;
+                                  print(_cityController);
+                                }),
                             value: _cityController,
                             items: items
                                 .map((type) => DropdownMenuItem(
-                              value: type.name,
-                              child: Text(type.name.toString()),
-                            ))
+                                      value: type.name,
+                                      child: Text(type.name.toString()),
+                                    ))
                                 .toList());
                       }
                     },
@@ -364,14 +369,14 @@ class _AddItemFormState extends State<AddItemForm> {
                       dropdownColor: Colors.blueAccent,
                       iconSize: 40,
                       onChanged: (val) => setState(() {
-                        _furnitureController = val as String?;
-                      }),
+                            _furnitureController = val as String?;
+                          }),
                       value: _furnitureController,
                       items: _listFurniture
                           .map((type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type),
-                      ))
+                                value: type,
+                                child: Text(type),
+                              ))
                           .toList()),
                   SizedBox(height: 24.0),
                   Text(
@@ -383,7 +388,6 @@ class _AddItemFormState extends State<AddItemForm> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   SizedBox(height: 24.0),
                   DropdownButtonFormField(
                       onTap: () => FocusScope.of(context).unfocus(),
@@ -402,14 +406,14 @@ class _AddItemFormState extends State<AddItemForm> {
                       dropdownColor: Colors.blueAccent,
                       iconSize: 40,
                       onChanged: (val) => setState(() {
-                        _typeController = val as String?;
-                      }),
+                            _typeController = val as String?;
+                          }),
                       value: _typeController,
                       items: _listType
                           .map((type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type),
-                      ))
+                                value: type,
+                                child: Text(type),
+                              ))
                           .toList()),
                   SizedBox(height: 24.0),
                   Text(
@@ -480,6 +484,7 @@ class _AddItemFormState extends State<AddItemForm> {
                     label: 'Number',
                     hint: 'Enter a number of bathroom...',
                   ),
+                  SizedBox(height: 8.0),
                   SizedBox(height: 24.0),
                   Text(
                     'Monthly Price',
@@ -527,6 +532,29 @@ class _AddItemFormState extends State<AddItemForm> {
                     label: 'Note',
                     hint: 'Enter a note(optional)...',
                   ),
+                  SizedBox(height: 18,),
+                  Center(
+                    child: Column(
+                      children: [
+                        Text('Rating: $rating',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                        ),
+                        RatingBar.builder(
+                            initialRating: rating,
+                            minRating: 1,
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            updateOnDrag: true,
+                            onRatingUpdate: (rating) {
+                              setState(() {
+                                this.rating = rating;
+                              });
+                            })
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 8.0),
                   Container(
                     child: Row(
@@ -550,175 +578,43 @@ class _AddItemFormState extends State<AddItemForm> {
                   SizedBox(height: 24.0),
                   _isProcessing
                       ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        CustomColors.firebaseOrange,
-                      ),
-                    ),
-                  )
+                          padding: const EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              CustomColors.firebaseOrange,
+                            ),
+                          ),
+                        )
                       : Container(
-                    width: double.maxFinite,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          CustomColors.firebaseOrange,
-                        ),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      onPressed: () async {
-                        showDialog(
-                            context: context,
-                            builder: (_context) {
-                              return AlertDialog(
-                                title: Text("Confirm your information",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                content: Text(
-                                  'Name Reporter: ' +
-                                      _nameReporterController.text +
-                                      '\n\n' +
-                                      'Rental name: ' +
-                                      _rentalNameController.text +
-                                      '\n\n' +
-                                      'Address: ' +
-                                      _addressController.text +
-                                      '\n\n' +
-                                      'City: ' +
-                                      _cityController.toString() +
-                                      '\n\n' +
-                                      'Furniture: ' +
-                                      _furnitureController.toString() +
-                                      '\n\n' +
-                                      'Type: ' +
-                                      _typeController.toString() +
-                                      '\n\n' +
-                                      'Number of Bedroom: ' +
-                                      _numBedController.text +
-                                      '\n\n' +
-                                      'Number of Kitten: ' +
-                                      _numKitController.text +
-                                      '\n\n' +
-                                      'Number of Bathroom: ' +
-                                      _numBathController.text +
-                                      '\n\n' +
-                                      'Price: ' +
-                                      _priceController.text +
-                                      '\n\n' +
-                                      'Note: ' +
-                                      _noteController.text +
-                                      '\n\n'
-                                          'Time: ' +
-                                      formatDate +
-                                      '\n\n',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
+                          width: double.maxFinite,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                CustomColors.firebaseOrange,
+                              ),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () async {
-                                        setState(() async {
-                                          widget.rentalNameFocusNode
-                                              .unfocus();
-                                          widget.noteFocusNode.unfocus();
-                                          widget.furnitureFocusNode
-                                              .unfocus();
-                                          widget.typeFocusNode.unfocus();
-                                          widget.cityFocusNode.unfocus();
-
-                                          if (_addItemFormKey
-                                              .currentState!
-                                              .validate()) {
-                                            setState(() {
-                                              ScaffoldMessenger.of(
-                                                  _context)
-                                                  .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      'Create succesfully at $formatDate')));
-                                              Navigator.of(_context)
-                                                  .pop();
-                                              _isProcessing = true;
-                                            });
-                                            await ApartmentData.addApartment(
-                                                rentalName:
-                                                _rentalNameController
-                                                    .text,
-                                                address:
-                                                _addressController
-                                                    .text,
-                                                city: _cityController
-                                                    .toString(),
-                                                furniture:
-                                                _furnitureController
-                                                    .toString(),
-                                                type: _typeController
-                                                    .toString(),
-                                                numBath: int.parse(
-                                                    _numBathController
-                                                        .text),
-                                                numBed: int.parse(
-                                                    _numBedController
-                                                        .text),
-                                                numKit: int.parse(
-                                                    _numKitController
-                                                        .text),
-                                                price: int.parse(
-                                                    _priceController.text),
-                                                note: _noteController.text,
-                                                nameOwn: _nameReporterController.text,
-                                                createdTime: formatDate);
-                                            Navigator.of(_context).pop();
-                                          }
-                                          ScaffoldMessenger.of(_context)
-                                              .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  'Error: Invalid enter fields. Please check the validator on the fields!!')));
-                                          Navigator.of(_context).pop();
-                                        });
-                                        Navigator.of(_context).pop();
-                                      },
-                                      child: Text(
-                                        "Yes",
-                                        style: dialogTextStyle,
-                                      )),
-                                  TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _isProcessing = false;
-                                          Navigator.of(_context).pop();
-                                        });
-                                      },
-                                      child: Text(
-                                        "No",
-                                        style: dialogTextStyle,
-                                      )),
-                                ],
-                                elevation: 24.0,
-                                backgroundColor:
-                                CustomColors.firebaseWhite,
-                              );
-                            });
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
-                        child: Text(
-                          'ADD ITEM',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: CustomColors.firebaseBlack,
-                            letterSpacing: 2,
+                              ),
+                            ),
+                            onPressed: () async {
+                              _showConfirmDialog(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                              child: Text(
+                                'ADD ITEM',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: CustomColors.firebaseBlack,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             )
@@ -726,15 +622,118 @@ class _AddItemFormState extends State<AddItemForm> {
         ));
   }
 
-  Future<bool> doesNameAlreadyExist(String name) async {
-    final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection('data')
-        .doc('rentalZ')
-        .collection(_auth.currentUser!.uid)
-        .where('nameApm', isEqualTo: name)
-        .limit(1)
-        .get();
-    final List<DocumentSnapshot> documents = result.docs;
-    return documents.length == 1;
-  }
+  void _showDialog() => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+
+        ),
+      );
+
+  void _showConfirmDialog(BuildContext context) => showDialog(
+      context: context,
+      builder: (_context) {
+        return AlertDialog(
+          title: Text("Confirm your information",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          content: Text(
+            'Name Reporter: ' +
+                _nameReporterController.text +
+                '\n\n' +
+                'Rental name: ' +
+                _rentalNameController.text +
+                '\n\n' +
+                'Address: ' +
+                _addressController.text +
+                '\n\n' +
+                'City: ' +
+                _cityController.toString() +
+                '\n\n' +
+                'Furniture: ' +
+                _furnitureController.toString() +
+                '\n\n' +
+                'Type: ' +
+                _typeController.toString() +
+                '\n\n' +
+                'Number of Bedroom: ' +
+                _numBedController.text +
+                '\n\n' +
+                'Number of Kitten: ' +
+                _numKitController.text +
+                '\n\n' +
+                'Number of Bathroom: ' +
+                _numBathController.text +
+                '\n\n' +
+                'Price: ' +
+                _priceController.text +
+                '\n\n' +
+                'Note: ' +
+                _noteController.text +
+                '\n\n'
+                    'Time: ' +
+                formatDate +
+                '\n\n',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  setState(() async {
+                    widget.rentalNameFocusNode.unfocus();
+                    widget.noteFocusNode.unfocus();
+                    widget.furnitureFocusNode.unfocus();
+                    widget.typeFocusNode.unfocus();
+                    widget.cityFocusNode.unfocus();
+
+                    if (_addItemFormKey.currentState!.validate()) {
+                      setState(() {
+                        ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+                            content:
+                                Text('Create succesfully at $formatDate')));
+                        Navigator.of(_context).pop();
+                        _isProcessing = true;
+                      });
+                      await Databases.addData(
+                          rentalName: _rentalNameController.text,
+                          address: _addressController.text,
+                          city: _cityController.toString(),
+                          furniture: _furnitureController.toString(),
+                          type: _typeController.toString(),
+                          numBath: int.parse(_numBathController.text),
+                          numBed: int.parse(_numBedController.text),
+                          numKit: int.parse(_numKitController.text),
+                          star: rating,
+                          price: int.parse(_priceController.text),
+                          note: _noteController.text,
+                          nameOwn: _nameReporterController.text,
+                          createdTime: formatDate);
+                      Navigator.of(_context).pop();
+                    }
+                    ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+                        content: Text(
+                            'Error: Invalid enter fields. Please check the validator on the fields!!')));
+                    Navigator.of(_context).pop();
+                  });
+                  Navigator.of(_context).pop();
+                },
+                child: Text(
+                  "Yes",
+                  style: dialogTextStyle,
+                )),
+            TextButton(
+                onPressed: () {
+                  setState(() {
+                    _isProcessing = false;
+                    Navigator.of(_context).pop();
+                  });
+                },
+                child: Text(
+                  "No",
+                  style: dialogTextStyle,
+                )),
+          ],
+          elevation: 24.0,
+          backgroundColor: CustomColors.firebaseWhite,
+        );
+      });
 }
+

@@ -10,7 +10,7 @@ class SearchBar extends StatelessWidget {
         onPressed: (){
           showSearch(
               context: context,
-              delegate: Search());
+              delegate: Search(name: 'Name Rental'));
         },
         icon: Icon(Icons.search, size: 32,));
   }
