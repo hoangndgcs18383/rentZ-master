@@ -1,6 +1,7 @@
 import 'package:apartment_project/models/database.dart';
 import 'package:apartment_project/shares/const.dart';
 import 'package:apartment_project/shares/custom_color.dart';
+import 'package:apartment_project/shares/vadidator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,7 +27,6 @@ class DetailApartment extends StatefulWidget {
 
 class _DetailApartmentState extends State<DetailApartment> {
   double rating = 0;
-  bool _isProcessing = false;
 
   final TextEditingController _noteController = TextEditingController();
 
@@ -59,7 +59,7 @@ class _DetailApartmentState extends State<DetailApartment> {
                   children: <Widget>[
                     SizedBox(
                       height: 330,
-                      child: Image.asset("assets/images/logo.png", fit: BoxFit.cover,),
+                      child: Image.asset("assets/images/logo.jpeg", fit: BoxFit.cover,),
                     ),
                     Positioned(
                       top: 42,
@@ -377,6 +377,7 @@ class _DetailApartmentState extends State<DetailApartment> {
                       SizedBox(height: 24.0),
                       Form(
                         child: TextFormField(
+                          validator: (value) => Validator.validatePrice(value: value!),
                           maxLines: 1,
                           controller: _noteController,
                           cursorColor: CustomColors.firebaseYellow,

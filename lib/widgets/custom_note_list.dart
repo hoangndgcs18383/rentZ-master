@@ -50,7 +50,7 @@ class NoteList extends StatelessWidget {
                             BorderRadius.circular(8.0),
                           ),
                           title: Text(
-                            "$note Note",
+                            "Note: $note",
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                             style: styleHeading_2Text.copyWith(
@@ -58,7 +58,7 @@ class NoteList extends StatelessWidget {
                                     .withOpacity(0.8)),
                           ),
                           subtitle: Text(
-                            "$createdTime Created",
+                            "Created :$createdTime",
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: styleHeading_2Text.copyWith(

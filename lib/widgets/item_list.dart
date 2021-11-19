@@ -64,7 +64,7 @@ class ItemList extends StatelessWidget {
                   leading: const Icon(Icons.home, size: 38, color: Colors.yellow,),
                   trailing: IconButton(
                     icon: Icon(Icons.edit),
-                    iconSize: 38,
+                    iconSize: 28,
                     color: Colors.lightGreenAccent,
                     onPressed: (){
                       Navigator.of(context).push(

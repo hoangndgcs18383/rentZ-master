@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 
 
 final CollectionReference _mainCollection =  FirebaseFirestore.instance.collection('data');
-final CollectionReference _noteCollection =  FirebaseFirestore.instance.collection('data');
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class ApartmentField extends Equatable{
@@ -178,7 +177,7 @@ class Databases{
     required String note,
     required String createdTime
   }) async{
-    DocumentReference docApartment = _noteCollection.doc(_auth.currentUser!.uid).collection('note').doc();
+    DocumentReference docApartment = _mainCollection.doc(_auth.currentUser!.uid).collection('note').doc();
 
     Map<String, dynamic> apartmentData = <String,dynamic>{
       'NoteRef': note,
@@ -191,7 +190,7 @@ class Databases{
 
   static Stream<QuerySnapshot> readNote() {
     CollectionReference docApartment =
-    _noteCollection.doc(_auth.currentUser!.uid).collection('note');
+    _mainCollection.doc(_auth.currentUser!.uid).collection('note');
     return docApartment.snapshots();
   }
 }

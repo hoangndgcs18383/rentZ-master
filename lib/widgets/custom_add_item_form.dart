@@ -249,97 +249,6 @@ class _AddItemFormState extends State<AddItemForm> {
                       }
                     },
                   ),
-                  // SizedBox(height: 24.0),
-                  // FutureBuilder(
-                  //   future: LocalApi.getLocal(),
-                  //   builder: (context, snapshot){
-                  //     if(!snapshot.hasData){
-                  //       return Padding(
-                  //         padding: const EdgeInsets.all(16.0),
-                  //         child: CircularProgressIndicator(
-                  //           valueColor: AlwaysStoppedAnimation<Color>(
-                  //             CustomColors.firebaseOrange,
-                  //           ),
-                  //         ),
-                  //       );
-                  //     }
-                  //     else if(snapshot.hasError){
-                  //       return Text("error");
-                  //     }
-                  //     else{
-                  //       var items = snapshot.data as List<City>;
-                  //       return DropdownButtonFormField(
-                  //           hint: const Text(
-                  //             "Select district",
-                  //             style: TextStyle(color: Colors.white),
-                  //           ),
-                  //           style: const TextStyle(
-                  //             fontSize: 20,
-                  //             fontWeight: FontWeight.bold,
-                  //             color: Colors.white,
-                  //           ),
-                  //           iconEnabledColor: Colors.lime,
-                  //           focusNode: widget.furnitureFocusNode,
-                  //           dropdownColor: Colors.blueAccent,
-                  //           onChanged: (val) => setState(() {
-                  //             _district = val as int;
-                  //           }),
-                  //           value: _district,
-                  //           items: items
-                  //               .map((type) => DropdownMenuItem(
-                  //             value: type.code,
-                  //             child: Text(type.name.toString()),
-                  //           ))
-                  //               .toList());
-                  //     }
-                  //   },
-                  // ),
-                  //
-                  // SizedBox(height: 24.0),
-                  // FutureBuilder(
-                  //   future: WardApi.getLocal(),
-                  //   builder: (context, snapshot){
-                  //     if(!snapshot.hasData){
-                  //       return Padding(
-                  //         padding: const EdgeInsets.all(16.0),
-                  //         child: CircularProgressIndicator(
-                  //           valueColor: AlwaysStoppedAnimation<Color>(
-                  //             CustomColors.firebaseOrange,
-                  //           ),
-                  //         ),
-                  //       );
-                  //     }
-                  //     else if(snapshot.hasError){
-                  //       return Text("error");
-                  //     }
-                  //     else{
-                  //       var items = snapshot.data as List<Ward>;
-                  //       return DropdownButtonFormField(
-                  //           hint: const Text(
-                  //             "Select ward",
-                  //             style: TextStyle(color: Colors.white),
-                  //           ),
-                  //           style: const TextStyle(
-                  //             fontSize: 20,
-                  //             fontWeight: FontWeight.bold,
-                  //             color: Colors.white,
-                  //           ),
-                  //           iconEnabledColor: Colors.lime,
-                  //           focusNode: widget.furnitureFocusNode,
-                  //           dropdownColor: Colors.blueAccent,
-                  //           onChanged: (val) => setState(() {
-                  //             _furnitureController = val as String?;
-                  //           }),
-                  //           value: _furnitureController,
-                  //           items: items
-                  //               .map((type) => DropdownMenuItem(
-                  //             value: type.name,
-                  //             child: Text(type.name.toString()),
-                  //           ))
-                  //               .toList());
-                  //     }
-                  //   },
-                  // ),
 
                   SizedBox(height: 24.0),
                   Text(
@@ -708,10 +617,10 @@ class _AddItemFormState extends State<AddItemForm> {
                           createdTime: formatDate);
                       Navigator.of(_context).pop();
                     }
-                    ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+
+                    Navigator.of(_context).pop();ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
                         content: Text(
                             'Error: Invalid enter fields. Please check the validator on the fields!!')));
-                    Navigator.of(_context).pop();
                   });
                   Navigator.of(_context).pop();
                 },
