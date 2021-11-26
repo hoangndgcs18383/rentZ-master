@@ -1,16 +1,11 @@
-# apartment_project
+# rentZ project
 
-A new Flutter project.
+A Flutter project of my Greenwich FPT University VN.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To connect to a Firebase Database, I use email of university(hoangndgcs18383@fpt.edu.vn)
 
-A few resources to get you started if this is your first Flutter project:
+To access the database please mail me to add permision.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![image](https://user-images.githubusercontent.com/74606110/143588759-fccacc90-f869-445e-b78d-245097f47f18.png)
